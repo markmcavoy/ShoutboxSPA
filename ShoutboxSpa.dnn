@@ -1,0 +1,86 @@
+<dotnetnuke type="Package" version="5.0">
+  <packages>
+    <package name="ShoutboxSpa" type="Module" version="01.00.00" isSystem="true">
+      <friendlyName>ShoutboxSpa</friendlyName>
+      <description>Shoutbox</description>
+      <owner>
+        <name>Mark McAvoy</name>
+        <organization>Zalabria Limited</organization>
+        <url>http://www.cartviper.com</url>
+        <email>mark@cartviper.com</email>
+      </owner>
+      <license src="eula.html"></license>
+      <releaseNotes src="releaseNotes.html"></releaseNotes>
+      <azureCompatible>true</azureCompatible>
+      <dependencies>
+        <dependency type="CoreVersion">08.00.00</dependency>
+      </dependencies>
+      <components>
+        <component type="Module">
+          <desktopModule>
+            <moduleName>ShoutboxSpa</moduleName>
+            <foldername>ShoutboxSpa</foldername>
+            <businessControllerClass>ShoutboxSpa.Components.ShoutboxSpaController,ShoutboxSpa</businessControllerClass>
+            <supportedFeatures>
+              <supportedFeature type="Portable" />
+              <supportedFeature type="Searchable" />
+            </supportedFeatures>
+            <moduleDefinitions>
+              <moduleDefinition>
+                <friendlyName>ShoutboxSpa</friendlyName>
+                <defaultCacheTime>0</defaultCacheTime>
+                <moduleControls>
+					        <moduleControl>
+						        <controlKey />
+						        <controlSrc>DesktopModules/ShoutboxSpa/Index.html</controlSrc>
+						        <supportsPartialRendering>False</supportsPartialRendering>
+						        <controlType>View</controlType>
+						        <supportsPopUps>False</supportsPopUps>
+						        <viewOrder>0</viewOrder>
+					        </moduleControl>
+                  <moduleControl>
+                    <controlKey>QuickSettings</controlKey>
+						          <controlSrc>DesktopModules/ShoutboxSpa/QuickSettings.html</controlSrc>
+						          <supportsPartialRendering>False</supportsPartialRendering>
+						          <controlType>View</controlType>
+						          <supportsPopUps>False</supportsPopUps>
+						          <viewOrder>0</viewOrder>
+					          </moduleControl>
+                  </moduleControls>
+              </moduleDefinition>
+            </moduleDefinitions>
+          </desktopModule>
+        </component>
+        <component type="Script">
+          <scripts>
+            <basePath>DesktopModules\ShoutboxSpa</basePath>
+            <script type="Install">
+              <name>01.00.00.SqlDataProvider</name>
+              <version>01.00.00</version>
+            </script>
+            <script type="UnInstall">
+              <name>Uninstall.SqlDataProvider</name>
+              <version>01.00.00</version>
+            </script>
+          </scripts>
+        </component>
+        <component type="Assembly">
+          <assemblies>
+            <assembly>
+              <path>bin</path>
+              <name>ShoutboxSpa.dll</name>
+            </assembly>
+          </assemblies>
+        </component>
+        <component type="ResourceFile">
+          <resourceFiles>
+            <basePath>DesktopModules/ShoutboxSpa</basePath>
+            <resourceFile>
+              <name>Resources.zip</name>
+            </resourceFile>
+          </resourceFiles>
+        </component>
+      </components>
+    </package>
+  </packages>
+</dotnetnuke>

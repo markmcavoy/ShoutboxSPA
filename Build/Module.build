@@ -1,0 +1,200 @@
+<?xml version="1.0"?>
+<!-- targets to be executed, when omitted from command line default is run -->
+<!--EXTERNAL_PROPERTIES: sys.env.windir-->
+<project name="TIA" default="BuildAndZip">
+    <target name="init">
+        <property name="nant.settings.currentframework" value="net-4.0" />
+
+        <!-- This is where your packaged zips will build to from within the module folder -->
+        <property name="package.dir" value="../package/" overwrite="false" />
+        <property name="lib" value="../lib/"/>
+
+        <property name="verbose" value="true" overwrite="false" />
+
+        <!-- ModuleName value should be set specific to the project -->
+        <property name="shortVersion" value="1.0.0"/>
+        <property name="ModuleName" value="ShoutboxSpa"  overwrite="false"  />
+        <property name="subproject.name" value="${ModuleName}"/>
+
+
+        <property name="debug" value="false" overwrite="false" />
+        <property name="config" value="debug" if="${debug}" />
+        <property name="config" value="release" unless="${debug}" />
+
+		<loadtasks assembly="C:\Program Files (x86)\nantcontrib-0.92\bin\NAnt.Contrib.Tasks.dll" />
+		
+        <sysinfo failonerror="false" />
+
+        <if test="${verbose}">
+            <echo message="debug:        ${debug}" />
+            <echo message="config:       ${config}" />
+        </if>
+
+        <mkdir dir="${package.dir}" unless="${directory::exists(package.dir)}" />
+
+
+        <property name="build.version.revision" value="0" />
+                
+    </target>
+
+
+    <target name="module.build" depends="init ">
+		<msbuild project="../${ModuleName}.csproj">
+			<property name="Configuration" value="Release"/>
+            <property name="OutputPath" value="./package/build"/>
+		</msbuild>
+		
+		<copy todir=".${package.dir}" flatten="false">
+			<fileset basedir="${package.dir}/build">
+				<include name="${ModuleName}.dll" />
+			</fileset>
+		</copy>
+		
+		<delete>
+				<fileset>
+						<!-- clean the output folder -->
+						<include name="${package.dir}/build/" />
+				</fileset>
+		</delete>
+    </target>
+
+
+    <!-- Begin area for creating resourcezip for installable PA zips (should depend on target that clears where this will build zip file to)-->
+    <target name="createResourceZip" depends="init">
+        <!-- create a flat directory to zip for install -->
+        <mkdir dir="temp" unless="${directory::exists('temp')}" />
+
+        <!-- DO NOT flatten this as we want to retain folder structure in this and ONLY this zip -->
+        <copy todir="temp" flatten="false">
+            <fileset basedir="../">
+                <!-- Tell nant what files to grab -->
+                <!-- everything included here ends up in resource.zip, this should be excluded in the CreateBinZip -->
+                <include name="**.ascx" />
+                <include name="**.asmx" />
+                <include name="**.aspx" />
+                <include name="**.ashx" />
+                <include name="**.resx" />
+                <include name="**.htm" />
+				<include name="**.html" />
+                <include name="**.css" />
+                <include name="**.js" />
+                <include name="**.gif" />
+                <include name="**.png" />
+                <include name="**.jpg" />
+                <include name="**.xslt" />
+                <include name="**.xsl" />
+                <include name="**.config" />
+				<include name="**.txt" />
+                <include name="Templates/*.*"/>
+                <include name="Fonts/*.*"/>
+                <exclude name="bin/**.*" />
+                <exclude name="Documentation/**.*" />
+                <exclude name="build/**.*" />
+                <exclude name="obj/**.*" />
+                <exclude name="package/**.*" />
+				<exclude name="packages/**.*" />
+                <exclude name="doc/**.*" />
+				<exclude name=".vs/**.*" />
+				<exclude name="nuget.config" />
+				<exclude name="packages.config" />
+            </fileset>
+        </copy>
+
+        <zip zipfile="${package.dir}Resources.zip">
+            <fileset basedir="temp">
+                <include name="**/*" />
+                <exclude name="**/*.dll" />
+
+            </fileset>
+        </zip>
+
+        <!--Delete temp directory -->
+        <delete dir="temp" failonerror="false" />
+
+    </target>
+    <!-- End area for resourcezip creation -->
+
+
+
+    <target name="createBinZip" depends="clean build createResourceZip">
+
+        <copy todir="temp" flatten="false">
+            <fileset>
+                <include name="../*.sqldataprovider" />
+                <include name="../*.dnn" />
+				<include name="../eula.html" />
+				<include name="../releasenotes.html" />
+            </fileset>
+        </copy>
+
+        <copy todir="temp/bin" flatten="false">
+            <fileset>
+                <include name="${package.dir}*.dll" />
+                <include name="../lib/*.dll" />
+            </fileset>
+        </copy>
+
+        <copy todir="temp" flatten="true">
+            <fileset>
+                <include name="${package.dir}Resources.zip" />
+            </fileset>
+        </copy>
+
+        <zip zipfile="${package.dir}${ModuleName}PA_${shortVersion}.zip">
+            <fileset basedir="temp">
+                <include name="**/*" />
+            </fileset>
+        </zip>
+
+        <!--Delete temp directory -->
+        <delete dir="temp" failonerror="false" />
+
+        <delete>
+            <fileset>
+                <include name="${package.dir}**.dll" />
+                <include name="${package.dir}Resources.zip" />
+            </fileset>
+        </delete>
+
+    </target>
+    <!-- End area for installable PA -->
+
+    <target name="zipResourcesEn" depends="clean">
+
+        <delete dir="temp" failonerror="false" />
+
+        <copy todir="temp" flatten="false">
+            <fileset basedir="../App_LocalResources">
+                <include name="*.resx" />
+            </fileset>
+        </copy>
+
+        <zip zipfile="${package.dir}ResxEn.zip">
+            <fileset basedir="temp">
+                <include name="**/*" />
+            </fileset>
+        </zip>
+
+        <delete dir="temp" failonerror="false" />
+    </target>
+
+
+    <!--  SYNTHETIC TASKS  -->
+    <target name="build" depends="clean module.build" description="This target compiles the application." />
+
+    <target name="package" depends="createBinZip" description="This target compiles the application." />
+
+    <target name="zipresources" depends="zipResourcesEn" description="Creates a zip file of all EN resource files, this can be used with online server to convert to other languages"/>
+
+    <target name="clean" depends="init" description="Delete all previously compiled binaries.">
+        <delete>
+            <fileset>
+                <!-- clean the output folder -->
+                <include name="${package.dir}**.*" />
+
+            </fileset>
+        </delete>
+    </target>
+
+
+</project>

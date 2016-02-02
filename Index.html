@@ -1,0 +1,282 @@
+﻿[JavaScript:{ path: "https://ajax.googleapis.com/ajax/libs/angularjs/1.3.15/angular.min.js"}]
+[JavaScript:{ path: "~/DesktopModules/ShoutboxSpa/js/toastr.min.js"}]
+[JavaScript:{ path: "~/js/dnn.servicesframework.js"}]
+[Css:{ path: "~/DesktopModules/ShoutboxSpa/module.css"}]
+[Css:{ path: "//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css"}] 
+
+<div id="shoutBox" ng-controller="shoutboxCtrl" ng-cloak>
+
+    <div id="shoutboxLoading" ng-hide="loaded">
+        Loading <i class="fa fa-circle-o-notch fa-spin"></i>
+    </div>
+
+
+
+    <div class="chat-activity-list">
+        
+        <h5 ng-show="loaded && !posts.length" class="noPosts">[Resx: {key: "noPosts"}]</h5>
+        
+        <div class="chat-element" ng-repeat="post in posts">
+            <div class="media-image">
+                <a href="#">
+                    <img class="img-circle" ng-if="profileImage == 0" ng-src="{{gravatar(post)}}" alt="{{post.DisplayName}}" />
+
+                    <img class="img-round" ng-if="profileImage == 1"
+                         ng-src="/dnnimagehandler.ashx?mode=profilepic&amp;userid={{post.UserId}}&amp;w=120&amp;h=120&amp;resizemode=crop"
+                         alt="{{post.DisplayName}}" />
+
+                </a>
+            </div>
+            <div class="media-body">
+                
+                <div class="media-shout">
+                    <small class="pull-right text-navy">
+                        {{post.PostAge}}
+                    </small>
+
+                    <strong ng-show="post.DisplayName">{{post.DisplayName}}</strong>
+                    <strong ng-hide="post.DisplayName">[Resx: {key : "anonymous"}]</strong>
+                    <p class="m-b-xs">
+                        {{post.Message}}
+                    </p>
+
+                    <div>
+                        <small class="text-muted">
+                            <span class="liked">[Resx: {key : "liked"}] <i class="fa fa-thumbs-o-up"></i> {{post.VoteUp}} </span>
+                            <span class="disliked">[Resx: {key : "disliked"}] <i class="fa fa-thumbs-o-down"></i> {{post.VoteDown}}</span>
+                        </small>
+                        <small class="dateStamp text-muted">{{post.CreatedDate | date}}</small>
+                    </div>
+                </div>
+
+                <div ng-show="allowInput" class="shoutButtonGroup">
+                    <a class="btn btn-default btn-xs" ng-click="like(post)"><i class="fa fa-thumbs-o-up"></i> [Resx: {key : "like"}]</a>
+                    <a class="btn btn-default btn-xs" ng-click="unlike(post)"><i class="fa fa-thumbs-o-down"></i> [Resx: {key : "dislike"}]</a>
+
+                    <a class="btn btn-default btn-xs" ng-hide="post.ReplyTo" ng-click="post.ShowReplyInput = !post.ShowReplyInput"><i class="fa fa-comments-o"></i> [Resx: {key : "reply"}]</a>
+                    <a class="btn btn-danger btn-xs" ng-show="allowEdit" ng-click="deletePost(post)"><i class="fa fa-trash-o"></i> Delete</a>
+                </div>
+
+                <div ng-show="post.ShowReplyInput" style="margin:20px 0;">
+                    <textarea ng-model="post.NewReply" class="postInput"></textarea>
+                    <div>
+                        <a class="btn btn-primary" ng-click="newReplyPost(post)"><i class="fa fa-comment-o"></i> [Resx: {key : "postreply"}]</a>
+                    </div>
+                </div>
+                
+            </div>
+
+
+            <div ng-repeat="reply in post.Replies" class="chatReply">
+                <div class="media-body">
+                    <div class="media-image">
+                        <a href="#" class="pull-left">
+                            <img class="img-circle" ng-if="profileImage == 0" ng-src="{{gravatar(reply)}}" alt=" {{reply.DisplayName}} " />
+
+                            <img class="img-rounded" ng-if="profileImage == 1"
+                                 ng-src="/dnnimagehandler.ashx?mode=profilepic&amp;userid={{reply.UserId}}&amp;w=120"
+                                 alt="{{reply.DisplayName}}" />
+                        </a>
+                     </div>
+
+                    <div class="media-body">
+                        <div class="media-shoutReply">
+                            <small class="pull-right text-navy">
+                                {{reply.PostAge}}
+                            </small>
+
+                            <strong ng-show="post.DisplayName">{{reply.DisplayName}}</strong>
+                            <strong ng-hide="post.DisplayName">[Resx: {key : "anonymous"}]</strong>
+                            <p class="m-b-xs">
+                                {{reply.Message}}
+                            </p>
+                            <div>
+                                <small class="text-muted">
+                                    <span class="liked">[Resx: {key : "liked"}] <i class="fa fa-thumbs-o-up"></i> {{reply.VoteUp}}</span>
+                                    <span class="disliked">[Resx: {key : "disliked"}] <i class="fa fa-thumbs-o-down"></i> {{reply.VoteDown}}</span>
+                                </small>
+                                <small class="dateStamp text-muted">{{reply.CreatedDate | date}}</small>
+                            </div>
+                        </div class="media-shoutReply">
+
+                        <div ng-show="allowInput" class="shoutButtonGroup">
+                            <a class="btn btn-default btn-xs" ng-click="like(reply)"><i class="fa fa-thumbs-o-up"></i> [Resx: {key : "like"}]</a>
+                            <a class="btn btn-default btn-xs" ng-click="unlike(reply)"><i class="fa fa-thumbs-o-down"></i> [Resx: {key : "dislike"}]</a>
+                            <a class="btn btn-danger btn-xs" ng-show="allowEdit" ng-click="deletePost(post)"><i class="fa fa-trash-o"></i> Delete</a>
+                        </div>
+
+                        <div ng-show="reply.ShowReplyInput">
+                            <textarea ng-model="post.NewReply"></textarea>
+                            <a class="btn btn-default" ng-click="newReplyPost(reply)">[Resx: {key : "postreply"}]</a>
+                        </div>
+
+                        
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+
+    </div>
+
+
+    <div ng-show="allowInput">
+        <h6>Post a New Comment</h6>
+        <textarea ng-model="newShout" class="postInput"></textarea>
+        <div>
+            <a class="btn btn-primary" ng-click="newPost()"><i class="fa fa-comment-o"></i> [Resx: {key : "post"}]</a>
+        </div>
+    </div>
+
+</div>
+
+<script type="text/javascript">
+    var sbApp = angular.module('sbApp', []);
+
+
+    sbApp.controller('shoutboxCtrl', function ($scope, $http, $interval) {
+
+        $scope.posts = [];
+        $scope.loaded = false;
+
+        var sf = $.ServicesFramework([ModuleContext:ModuleId]);
+        $scope.serviceRoot = sf.getServiceRoot('ShoutboxSpa');
+
+        $http.defaults.headers.common.ModuleId = [ModuleContext:ModuleId];
+        $http.defaults.headers.common.TabId = [ModuleContext:TabId];
+        $http.defaults.headers.common.RequestVerificationToken = $('[name="__RequestVerificationToken"]').val();
+
+        $interval( function(){ $scope.loadPosts(); }, 10000);
+
+        $scope.newReplyPost = function(post){
+            var data = {};
+            data.replyToItemId = post.ItemId;
+            data.message = post.NewReply;
+            
+            $http({
+                method: 'POST',
+                url: $scope.serviceRoot + 'Main/NewReplyPost',
+                params: data,
+            }).then(function successCallback(response) {
+
+                if(response.data.success){
+                    $scope.posts = response.data.data.posts;
+                    $scope.newShout = "";
+                }else{
+                    toastr.error(response.data.message);
+                }
+            }, function errorCallback(response) {
+            });
+        };
+
+        $scope.like = function(post){
+            var data = {};
+            data.itemId = post.ItemId;
+            
+            $http({
+                method: 'POST',
+                url: $scope.serviceRoot + 'Main/VoteUp',
+                params: data,
+            }).then(function successCallback(response) {
+                if(response.data.success){
+                    post.VoteUp = response.data.data.voteUp;
+                }else{
+                    toastr.error('[Resx: {Key : "floodVote"}]');
+                }
+            }, function errorCallback(response) {
+            });
+        };
+
+        $scope.deletePost = function(post){
+            if(confirm('[Resx: {key : "confirmPostDelete"}]')){
+                var data = {};
+                data.itemId = post.ItemId;
+
+                $http({
+                    method: 'DELETE',
+                    url: $scope.serviceRoot + 'Main/DeletePost',
+                    params: data,
+                }).then(function successCallback(response) {
+                    $scope.loadPosts();
+                }, function errorCallback(response) {
+                });
+            }
+        };
+
+        $scope.unlike = function(post){
+            var data = {};
+            data.itemId = post.ItemId;
+
+            $http({
+                method: 'POST',
+                url: $scope.serviceRoot + 'Main/VoteDown',
+                params: data,
+            }).then(function successCallback(response) {
+                if(response.data.success){
+                    post.VoteDown = response.data.data.voteDown;
+                }else{
+                    toastr.error('[Resx: {Key : "floodVote"}]');
+                }
+            }, function errorCallback(response) {
+            });
+        };
+
+        $scope.newPost = function(){
+            var data = {};
+            data.post = $scope.newShout;
+            
+            $http({
+                method: 'POST',
+                url: $scope.serviceRoot + 'Main/NewPost',
+                params: data,
+            }).then(function successCallback(response) {
+
+                if(response.data.success){
+                    $scope.posts = response.data.data.posts;
+                    $scope.newShout = "";
+                }else{
+                    toastr.error(response.data.message);
+                }
+            }, function errorCallback(response) {
+            });
+        };
+
+        $scope.gravatar = function(post){
+            return "http://www.gravatar.com/avatar/" + post.GravatarKey + "?d=identicon&amp;s=48";
+        };
+
+        $scope.loadPosts = function () {
+
+            var data = {};
+            
+            if($scope.posts && $scope.posts.length > 0){
+                for (var i = 0; i < $scope.posts.length; i++) {
+                    if($scope.posts[i].ShowReplyInput){
+                        return;
+                    }
+                }
+            }
+
+            $http({
+                method: 'GET',
+                url: $scope.serviceRoot + 'Main/GetShouts',
+                params: data,
+            }).then(function successCallback(response) {
+                $scope.posts = response.data.data.posts;
+                $scope.allowEdit = response.data.data.allowEdit;
+                $scope.allowInput = response.data.data.allowInput;
+                $scope.profileImage = response.data.data.profileImage;
+                $scope.loaded = true;
+            }, function errorCallback(response) {
+            });
+        };
+
+        $scope.loadPosts();
+
+    });
+
+    angular.element(document).ready(function() {
+        angular.bootstrap(document.getElementById('shoutBox'), ['sbApp']);
+    });
+</script>

@@ -1,0 +1,127 @@
+﻿[JavaScript:{ path: "https://ajax.googleapis.com/ajax/libs/angularjs/1.3.15/angular.min.js"}]
+[JavaScript:{ path: "~/js/dnn.servicesframework.js"}]
+
+<div id="shoutBoxSettings" ng-controller="shoutboxCtrl" ng-cloak class="dnnForm">
+    <div class="dnnFormMessage dnnFormInfo">
+        [Resx: {key : "quickSettings" }]
+    </div>
+    <div class="dnnFormItem">
+        <div>[Resx: { key: "allowAnonymous" }]</div>
+        <div>
+            <input type="checkbox" class="normalCheckBox" ng-model="settings.AllowAnonymous"/>
+        </div>
+    </div>
+
+
+    <div class="dnnFormItem">
+        <div>[Resx: { key: "profileImg" }]</div>
+        <div>
+            <input type="radio" name="profileImgSrc" ng-model="settings.ProfileImageSource" ng-value="0" /> [Resx: {key: "profileImgGravatar.Text"}]
+            <input type="radio" name="profileImgSrc" ng-model="settings.ProfileImageSource" ng-value="1" /> [Resx: {key: "profileImgDnn.Text"}]
+        </div>
+    </div>
+    <div class="dnnFormItem">
+        <div>[Resx: { key: "returnCount" }]</div>
+        <div>
+            <input type="text" ng-model="settings.RecordLimit" />
+        </div>
+    </div>
+    <div class="dnnFormItem">
+        <div>[Resx: { key: "oldPostCount" }]</div>
+        <div>
+            {{oldShoutsCount}} [Resx: {key: "itemCount"}]
+            <a ng-click="deleteOld()" class="btn btn-sm btn-default">[Resx: {key: "deleteOldPosts"}]</a>
+        </div>
+    </div>
+    <h4 style="margin-top:10px;">[Resx: {key: "floodControl"}]</h4>
+    <div class="dnnFormItem">
+        <div>[Resx: { key: "voteTime" }]</div>
+        <div>
+            <input type="text" ng-model="settings.FloodVoting"/>
+        </div>
+    </div>
+    <div class="dnnFormItem">
+        <div>[Resx: { key: "replyTime" }]</div>
+        <div>
+            <input type="text" ng-model="settings.FloodReply" />
+        </div>
+    </div>
+    <div class="dnnFormItem">
+        <div>[Resx: { key: "newPostTime" }]</div>
+        <div>
+            <input type="text" ng-model="settings.FloodNewPost" />
+        </div>
+    </div>
+</div>
+
+
+<script type="text/javascript">
+    var sbSettingsApp = angular.module('sbSettingsApp', []);
+
+
+    sbSettingsApp.controller('shoutboxCtrl', function ($scope, $http, $interval) {
+        $scope.settings = {};
+
+        var sf = $.ServicesFramework([ModuleContext:ModuleId]);
+        $scope.serviceRoot = sf.getServiceRoot('ShoutboxSpa');
+
+        $http.defaults.headers.common.ModuleId = [ModuleContext:ModuleId];
+        $http.defaults.headers.common.TabId = [ModuleContext:TabId];
+        $http.defaults.headers.common.RequestVerificationToken = $('[name="__RequestVerificationToken"]').val();
+
+
+        $scope.deleteOld = function(){
+            if(confirm('[Resx: {key : "confirmDelete"}]')){
+                $http({
+                    method: 'DELETE',
+                    url: $scope.serviceRoot + 'Settings/PurgeOld',
+                }).then(function successCallback(response) {
+                    $scope.settings = response.data.data.results;
+                }, function errorCallback(response) {
+                });
+            }
+        };
+
+        $scope.loadSettings = function () {
+            var data = {};
+
+            $http({
+                method: 'GET',
+                url: $scope.serviceRoot + 'Settings/GetSettings',
+                params: data,
+            }).then(function successCallback(response) {
+                $scope.settings = response.data.data.results;
+                $scope.oldShoutsCount = response.data.data.oldShoutsCount;
+            }, function errorCallback(response) {
+            });
+        };
+
+        $scope.saveSettings = function(){
+
+            $http({
+                method: 'POST',
+                url: $scope.serviceRoot + 'Settings/SaveSettings',
+                data: $scope.settings,
+            }).then(function successCallback(response) {
+                console.log(response);
+            }, function errorCallback(response) {
+            });
+            
+        };
+
+        $scope.loadSettings();
+
+    });
+
+    angular.element(document).ready(function () {
+        angular.bootstrap(document.getElementById('shoutBoxSettings'), ['sbSettingsApp']);
+
+        var scope = angular.element($('#shoutBoxSettings')).scope();
+
+        $('#shoutBoxSettings').dnnQuickSettings({
+            moduleId: [ModuleContext:ModuleId],
+            onSave: scope.saveSettings
+        });
+    });
+
+</script>

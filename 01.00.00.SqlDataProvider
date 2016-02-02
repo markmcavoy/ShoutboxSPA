@@ -1,0 +1,21 @@
+if not exists (select * from dbo.sysobjects where id = object_id(N'{databaseOwner}[{objectQualifier}ShoutboxSpa]') and OBJECTPROPERTY(id, N'IsTable') = 1)
+	BEGIN
+		CREATE TABLE {databaseOwner}[{objectQualifier}ShoutboxSpa]
+		(
+			[ModuleID] [int] NOT NULL,
+			[ItemID] [int] NOT NULL IDENTITY(1, 1),
+			[Message] [nvarchar](max) NOT NULL,
+			[UserId] [int]  NULL,
+			[CreatedDate] [datetime] NOT NULL,
+			[VoteUp] [int] NOT NULL,
+			[VoteDown] [int] NOT NULL,
+			[ReplyTo] [int] NULL
+		)
+
+		ALTER TABLE {databaseOwner}[{objectQualifier}ShoutboxSpa] ADD CONSTRAINT [PK_{objectQualifier}ShoutboxSpa] PRIMARY KEY CLUSTERED  ([ItemID])
+		
+		CREATE NONCLUSTERED INDEX [IX_{objectQualifier}ShoutboxSpa] ON {databaseOwner}[{objectQualifier}ShoutboxSpa] ([ModuleID])
+
+		ALTER TABLE {databaseOwner}[{objectQualifier}ShoutboxSpa] WITH NOCHECK ADD CONSTRAINT [FK_{objectQualifier}ShoutboxSpa_{objectQualifier}Modules] FOREIGN KEY ([ModuleID]) REFERENCES {databaseOwner}[{objectQualifier}Modules] ([ModuleID]) ON DELETE CASCADE
+	END
+GO
