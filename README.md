@@ -5,7 +5,7 @@ This is a DNN 8 module using the SPA pattern. Written using AngularJS this modul
 Features include
 - Profanity Check on all post
 - Spam control on the new posts, replies and voting
-- Support for anonymoust posting
+- Support for anonymous posting
 - Uses the Quicksetting DNN pattern
 - Support for DNN profile images or gravatar images
 - Supports exporting/importing
