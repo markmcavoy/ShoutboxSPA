@@ -3,6 +3,7 @@
 This is a DNN 8 module using the SPA pattern. Written using AngularJS this module creates a shoutbox/chat style module. 
 
 Features include
+- Content auto refreshes with any new posts, replies or votes
 - Profanity Check on all post
 - Spam control on the new posts, replies and voting
 - Support for anonymous posting
