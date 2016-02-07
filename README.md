@@ -25,4 +25,10 @@ In the /build folder double click nant64.bat then type `nant package` to create 
 
 You can also just run `nant build` to have the dll compiled.
 
+#Demo Video
+[View the demo on YouTube](https://www.youtube.com/watch?v=70FC67q-0dI)
+
+#Getting Started
 [Read the getting started guide](https://github.com/markmcavoy/ShoutboxSPA/wiki)
+
+
